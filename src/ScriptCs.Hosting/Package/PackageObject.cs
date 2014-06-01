@@ -51,7 +51,11 @@ namespace ScriptCs.Hosting.Package
 
         public IEnumerable<string> GetCompatibleDlls(FrameworkName frameworkName)
         {
-            var dlls = _package.GetLibFiles().Where(i => i.EffectivePath.EndsWith(Dll) || i.EffectivePath.EndsWith(Exe));
+            var dlls = _package
+                .GetLibFiles()
+                .Concat(_package.GetToolFiles())
+                .Where(i => i.EffectivePath.EndsWith(Dll) || i.EffectivePath.EndsWith(Exe));
+
             IEnumerable<IPackageFile> compatibleFiles;
             VersionUtility.TryGetCompatibleItems(frameworkName, dlls, out compatibleFiles);
 

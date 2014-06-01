@@ -15,9 +15,9 @@ namespace ScriptCs.Hosting.Package
 
         private const string DotNetPortable = ".NETPortable";
 
-        private readonly IFileSystem _fileSystem;
+        protected readonly IFileSystem _fileSystem;
 
-        private readonly ILog _logger;
+        protected readonly ILog _logger;
 
         public PackageContainer(IFileSystem fileSystem, ILog logger)
         {
@@ -27,7 +27,7 @@ namespace ScriptCs.Hosting.Package
             _logger = logger;
         }
 
-        public void CreatePackageFile()
+        public virtual void CreatePackageFile()
         {
             var packagesFile = Path.Combine(_fileSystem.CurrentDirectory, _fileSystem.PackagesFile);
             var packageReferenceFile = new PackageReferenceFile(packagesFile);
@@ -85,7 +85,7 @@ namespace ScriptCs.Hosting.Package
             return package == null ? null : new PackageObject(package, packageRef.FrameworkName);
         }
 
-        public IEnumerable<IPackageReference> FindReferences(string path)
+        public virtual IEnumerable<IPackageReference> FindPackageReferences(string path)
         {
             var packageReferenceFile = new PackageReferenceFile(path);
 
@@ -99,6 +99,20 @@ namespace ScriptCs.Hosting.Package
                             packageReference.TargetFramework,
                             packageReference.Version.Version,
                             packageReference.Version.SpecialVersion);
+                }
+
+                yield break;
+            }
+        }
+
+        public IEnumerable<IPackageReference> FindReferences(string path)
+        {
+            var packageReferences = this.FindPackageReferences(path);
+            if (packageReferences.Any())
+            {
+                foreach (var packageReference in packageReferences)
+                {
+                    yield return packageReference;
                 }
 
                 yield break;
