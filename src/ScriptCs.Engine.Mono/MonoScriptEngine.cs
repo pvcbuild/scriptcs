@@ -50,10 +50,10 @@ namespace ScriptCs.Engine.Mono
                 var allNamespaces = namespaces.Union(scriptPackSession.Namespaces).Distinct();
 
                 var host = _scriptHostFactory.CreateScriptHost(new ScriptPackManager(scriptPackSession.Contexts), scriptArgs);
-                var hostResult = MonoHostBuilder.Build((ScriptHost)host);
+                MonoHost.SetHost((ScriptHost)host);
 
-                evaluator.ReferenceAssembly(hostResult.Assembly);
-                evaluator.InteractiveBaseClass = hostResult.Type;
+                evaluator.ReferenceAssembly(typeof(MonoHost).Assembly);
+                evaluator.InteractiveBaseClass = typeof(MonoHost);
 
                 sessionState = new SessionState<Evaluator>
                 {
